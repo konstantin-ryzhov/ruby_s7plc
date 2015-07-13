@@ -3,20 +3,18 @@ Ruby library for Siemens Simatic S7-300 PLC data exchange.
 
 ## Quick start
 ```ruby
-  require './simatic_plc'
-  require './simatic_types'
+  require 'simatic'
   Simatic::Plc.exchange('192.168.0.1') do |plc|
     plc.write('db1.dbw2'=> 0xffff)
     res = plc.read('db1.dbw2')
-    puts "#{res.verbal} = #{SimaticTypes::Word.parse(res.value)}"
+    puts "#{res.verbal} = #{Simatic::Types::Word.parse(res.value)}"
   end
 ```
 
 ## Reference
 ### Requires
 ```ruby
-  require './simatic_plc' # exchange classes and functions
-  require './simatic_types' # convertation classes and functions
+  require 'simatic'
 ```
 
 ### Client creation
@@ -52,30 +50,30 @@ plc.write('db1.dbw2' => 0xffff)
 ```
 This function take a hash with verbal addresses and values to write pairs. Values can be simple types like Integer, Float, one char String, Date, Time or it can be special types of SimaticTypes Module.
 ```ruby
-plc.write('db1.dbb18[2]'  => SimaticTypes::S5time.new(711.3))
+plc.write('db1.dbb18[2]'  => Simatic::Types::S5time.new(711.3))
 ```
 
 ### Convertation functions
 ```ruby
-SimaticTypes::Bool   # use TrueClass, FalseClass
-SimaticTypes::Byte   # use Numeric
-SimaticTypes::Word   # use Numeric
-SimaticTypes::Dword  # use Numeric
-SimaticTypes::Int    # use Numeric
-SimaticTypes::Dint   # use Numeric
-SimaticTypes::Real   # use Numeric
-SimaticTypes::S5time # use Numeric as a time in seconds
-SimaticTypes::IECTime     # use Numeric as a time in seconds
-SimaticTypes::IECDate     # use Numeric as a days
-SimaticTypes::TimeOfDay   # use Numeric as a seconds from start of day 0:00 a.m.
-SimaticTypes::DateAndTime # use Time
-SimaticTypes::S7String    # use String with length of buffer param
+Simatic::Types::Bool   # use TrueClass, FalseClass
+Simatic::Types::Byte   # use Numeric
+Simatic::Types::Word   # use Numeric
+Simatic::Types::Dword  # use Numeric
+Simatic::Types::Int    # use Numeric
+Simatic::Types::Dint   # use Numeric
+Simatic::Types::Real   # use Numeric
+Simatic::Types::S5time # use Numeric as a time in seconds
+Simatic::Types::IECTime     # use Numeric as a time in seconds
+Simatic::Types::IECDate     # use Numeric as a days
+Simatic::Types::TimeOfDay   # use Numeric as a seconds from start of day 0:00 a.m.
+Simatic::Types::DateAndTime # use Time
+Simatic::Types::S7String    # use String with length of buffer param
 ```
 Each of this objects take Ruby types with ```new``` method and gives you with ```parse``` method:
 ```ruby
-SimaticTypes::S5time.new(10.2)
-SimaticTypes::S5time.parse(res.raw_data)
-SimaticTypes::S7String.new("hello world", 15) # 15 is a length of buffer (address for this string to read or write must be [17])
+Simatic::Types::S5time.new(10.2)
+Simatic::Types::S5time.parse(res.raw_data)
+Simatic::Types::S7String.new("hello world", 15) # 15 is a length of buffer (address for this string to read or write must be [17])
 ```
 For special types like S5time, IECTime, IECDate, TimeOfDay, DateAndTime, S7String you should use ```raw_data``` method instead of `value`, because if you write an adress with [] notation of bytes ```value``` will return a array of chars.
 
