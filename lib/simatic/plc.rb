@@ -1,8 +1,10 @@
 require 'socket'
-require './simatic_protocol'
-require './simatic_memory'
+require 'simatic/sessions'
+require 'simatic/memory_mapper'
 
 module Simatic
+  BUFFER_SIZE = 1000
+
   class Plc
     def initialize address, args = {}
       @address = address
@@ -10,10 +12,10 @@ module Simatic
       @slot = args[:slot] || 2 
     end
 
-    def self.exchange address, args = {}
+    def self.exchange address, args = {}, timeout = 500
       plc = self.new address, args
 
-      plc.connect
+      plc.connect timeout
       yield plc
       plc.disconnect
     end
@@ -23,7 +25,7 @@ module Simatic
         raise "Plc #{@address} is not connected"
       end
 
-      read = ReadSession.new
+      read = Sessions::ReadSession.new
       memory_mappers = []
       args.each do |verbal|
         memory_mappers << MemoryMapper.new(verbal)
@@ -53,7 +55,7 @@ module Simatic
         memory_mappers << MemoryMapper.new(verbal, value: value)
       end
 
-      write = WriteSession.new
+      write = Sessions::WriteSession.new
       request = write.make_request memory_mappers
       @socket.send request, 0
 
@@ -66,14 +68,14 @@ module Simatic
       result = write.parse_response response
     end
     
-    def connect
-      @socket = TCPSocket.new @address, 102
+    def connect timeout = 500
+      @socket = Socket.tcp @address, 102, connect_timeout: timeout / 1000.0
 
-      setup = SetupSession.new @rack, @slot
+      setup = Sessions::SetupSession.new @rack, @slot
       @socket.send setup.make_request, 0
       setup.parse_response @socket.recv BUFFER_SIZE
 
-      open = OpenSession.new
+      open = Sessions::OpenSession.new
       @socket.send open.make_request, 0
       open.parse_response @socket.recv BUFFER_SIZE
 

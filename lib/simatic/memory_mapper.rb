@@ -1,5 +1,3 @@
-require './simatic_types'
-
 module Simatic
   class MemoryMapper
     attr_reader :verbal
@@ -25,7 +23,7 @@ module Simatic
     def parse_address verbal = @verbal
       /^(DB\s*(?<db>\d+)(\.|\s*))?(?<area>PI|PQ|I|Q|M|DB|T|C)(?<type>X|B|W|D)?\s*?(?<adr>\d+)(\.(?<bit>\d+))?\s*?(\[(?<count>\d+)\])?$/i =~ verbal
       
-      @db      = db    ? db.to_i    : nil       
+      @db      = db    ? db.to_i    : 0
       @count   = count ? count.to_i : 1 
       @address = adr   ? adr.to_i   : nil
       @bit     = bit   ? bit.to_i   : nil
@@ -73,30 +71,30 @@ module Simatic
       val_array.each do |v|
 
         val = case v
-          when SimaticTypes::SimaticType
+          when Simatic::Types::SimaticType
             v
           when Integer
             case @length
             when 1
-              SimaticTypes::Byte.new(v)
+              Simatic::Types::Byte.new(v)
             when 2
-              SimaticTypes::Int.new(v)
+              Simatic::Types::Int.new(v)
             when 4
-              SimaticTypes::Dint.new(v)
+              Simatic::Types::Dint.new(v)
             else
               raise "Cannot convert #{v.class} to SimaticType class"
             end
           when Float
-            SimaticTypes::Real.new(v)
+            Simatic::Types::Real.new(v)
           when TrueClass, FalseClass
-            SimaticTypes::Bool.new(v)
+            Simatic::Types::Bool.new(v)
           when String
             raise "Cannot write string to plc use SimaticType::S7String class" if length > 1
-            SimaticTypes::Char.new(v) if v.length == 1
+            Simatic::Types::Char.new(v) if v.length == 1
           when Date
-            SimaticTypes::IECDate.new(v)
+            Simatic::Types::IECDate.new(v)
           when Time
-            SimaticTypes::DateAndTime.new(v)
+            Simatic::Types::DateAndTime.new(v)
           else
             raise "Unknoun type of write value <#{v.class}> #{v}"
         end
@@ -189,6 +187,5 @@ module Simatic
 
     def as_string raw_data
     end
-
   end
 end

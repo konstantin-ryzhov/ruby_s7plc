@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "simatic"
+
+ip = ARGV.shift
+address = ARGV.shift
+
+type = nil
+slot = 2
+rack = 0
+
+while param = ARGV.shift do
+  case param
+    when '-t', '--type'
+      type = ARGV.shift
+    when '--slot'
+      slot = ARGV.shift
+    when '--rack'
+      rack = ARGV.shift
+    when '-h', '--help'
+      puts "USAGE"
+      puts "read <ip> <address> (-t|--type <type>) [--rack <rack>] [--slot <slot>] [-h|--help]"
+      puts "avaliable types #{Simatic::Types.avaliable}"
+      puts "EXAMPLE"
+      puts "read 192.168.0.1 db0.dbw4 -t int"
+      exit
+  end
+end
+
+#puts "address #{address}"
+#puts "type #{type}"
+#puts "rack #{rack}"
+#puts "slot #{slot}"
+
+Simatic::Plc.exchange(ip, rack: rack, slot: slot) do |plc|
+  value = plc.read(address).value
+  puts "#{address}: #{Simatic::Types.parse value, type}"
+end
