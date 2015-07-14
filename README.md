@@ -1,3 +1,6 @@
+[![Version](https://img.shields.io/gem/v/simatic.svg)](https://rubygems.org/gems/simatic)
+[![Inline docs ](http://inch-ci.org/github/konstantin-ryzhov/ruby_s7plc.svg?style=flat)](http://inch-ci.org/github/konstantin-ryzhov/ruby_s7plc)
+
 # ruby_s7plc
 Ruby library for Siemens Simatic S7-300 PLC data exchange.
 
@@ -12,6 +15,16 @@ Ruby library for Siemens Simatic S7-300 PLC data exchange.
 ```
 
 ## Reference
+### Install
+```ruby
+  # in Gemfile
+  gem 'simatic'
+```
+or
+```bash
+  gem install simatic
+```
+
 ### Requires
 ```ruby
   require 'simatic'
